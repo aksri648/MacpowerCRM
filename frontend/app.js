@@ -478,7 +478,7 @@ function closeModal() {
 async function convertLead(leadId) {
   showLoading();
 
-  const result = await apiCall('convertLead', 'POST', { leadId });
+  const result = await apiCall('convertLead', 'GET', { leadId });
 
   if (result && result.success) {
     showSnackbar('Lead converted successfully!');
@@ -493,7 +493,7 @@ async function convertLead(leadId) {
 async function updateLeadStatus(leadId, status) {
   showLoading();
 
-  const result = await apiCall('updateLead', 'POST', { leadId, status });
+  const result = await apiCall('updateLead', 'GET', { leadId, status });
 
   if (result && result.success) {
     showSnackbar('Lead status updated!');
@@ -510,7 +510,7 @@ async function deleteLead(leadId) {
 
   showLoading();
 
-  const result = await apiCall('deleteLead', 'POST', { leadId });
+  const result = await apiCall('deleteLead', 'GET', { leadId });
 
   if (result && result.success) {
     showSnackbar('Lead deleted');
@@ -622,7 +622,7 @@ async function handleFormSubmit(e) {
 
   showLoading();
 
-  const result = await apiCall('addLead', 'POST', formData);
+  const result = await apiCall('addLead', 'GET', formData);
 
   if (result && result.success) {
     showSnackbar('Lead added successfully!');
