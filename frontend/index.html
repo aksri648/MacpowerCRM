@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>MacpowerCRM</title>
+  <link rel="stylesheet" href="styles.css">
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+</head>
+<body>
+  <!-- Splash Screen -->
+  <div id="splash-screen" class="splash-screen">
+    <div class="splash-content">
+      <div class="splash-icon">
+        <span class="material-icons">business_center</span>
+      </div>
+      <h1>MacpowerCRM</h1>
+      <p>Loading...</p>
+    </div>
+  </div>
+
+  <!-- Main App Container -->
+  <div id="app" class="app-container" style="display: none;">
+    <!-- Top App Bar -->
+    <header class="top-bar">
+      <button class="icon-btn" id="menuBtn">
+        <span class="material-icons">menu</span>
+      </button>
+      <h1 class="top-bar-title" id="pageTitle">Dashboard</h1>
+      <button class="icon-btn" id="searchBtn">
+        <span class="material-icons">search</span>
+      </button>
+    </header>
+
+    <!-- Search Bar (Hidden by default) -->
+    <div class="search-bar" id="searchBar" style="display: none;">
+      <span class="material-icons">search</span>
+      <input type="text" id="searchInput" placeholder="Search leads...">
+      <button class="icon-btn" id="closeSearchBtn">
+        <span class="material-icons">close</span>
+      </button>
+    </div>
+
+    <!-- Side Navigation Drawer -->
+    <nav class="side-drawer" id="sideDrawer">
+      <div class="drawer-header">
+        <div class="drawer-logo">
+          <span class="material-icons">business_center</span>
+        </div>
+        <h2>MacpowerCRM</h2>
+        <p>Sales Management</p>
+      </div>
+      <ul class="drawer-menu">
+        <li class="drawer-item active" data-page="dashboard">
+          <span class="material-icons">dashboard</span>
+          <span>Dashboard</span>
+        </li>
+        <li class="drawer-item" data-page="addLead">
+          <span class="material-icons">add_circle</span>
+          <span>Add Lead</span>
+        </li>
+        <li class="drawer-item" data-page="leads">
+          <span class="material-icons">people</span>
+          <span>All Leads</span>
+        </li>
+        <li class="drawer-item" data-page="enquiries">
+          <span class="material-icons">help_outline</span>
+          <span>Enquiries</span>
+        </li>
+        <li class="drawer-item" data-page="conversions">
+          <span class="material-icons">check_circle</span>
+          <span>Conversions</span>
+        </li>
+        <li class="drawer-item" data-page="settings">
+          <span class="material-icons">settings</span>
+          <span>Settings</span>
+        </li>
+      </ul>
+    </nav>
+    <div class="drawer-overlay" id="drawerOverlay"></div>
+
+    <!-- Main Content Area -->
+    <main class="main-content" id="mainContent">
+      <!-- Dashboard Page -->
+      <section class="page active" id="dashboardPage">
+        <div class="stats-grid">
+          <div class="stat-card leads">
+            <div class="stat-icon">
+              <span class="material-icons">people</span>
+            </div>
+            <div class="stat-info">
+              <h3 id="leadsCount">0</h3>
+              <p>Total Leads</p>
+            </div>
+          </div>
+          <div class="stat-card enquiries">
+            <div class="stat-icon">
+              <span class="material-icons">help_outline</span>
+            </div>
+            <div class="stat-info">
+              <h3 id="enquiriesCount">0</h3>
+              <p>Enquiries</p>
+            </div>
+          </div>
+          <div class="stat-card conversions">
+            <div class="stat-icon">
+              <span class="material-icons">check_circle</span>
+            </div>
+            <div class="stat-info">
+              <h3 id="conversionsCount">0</h3>
+              <p>Conversions</p>
+            </div>
+          </div>
+          <div class="stat-card rate">
+            <div class="stat-icon">
+              <span class="material-icons">trending_up</span>
+            </div>
+            <div class="stat-info">
+              <h3 id="conversionRate">0%</h3>
+              <p>Conversion Rate</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="section-header">
+          <h2>Recent Leads</h2>
+          <button class="text-btn" onclick="navigateTo('leads')">View All</button>
+        </div>
+        <div class="recent-leads-list" id="recentLeadsList">
+          <!-- Dynamic content -->
+        </div>
+      </section>
+
+      <!-- Add Lead Page -->
+      <section class="page" id="addLeadPage">
+        <form class="lead-form" id="leadForm">
+          <div class="form-section">
+            <h3 class="form-section-title">
+              <span class="material-icons">business</span>
+              Company Information
+            </h3>
+            <div class="form-field">
+              <label for="companyName">Company Name *</label>
+              <input type="text" id="companyName" name="companyName" required placeholder="Enter company name">
+            </div>
+          </div>
+
+          <div class="form-section">
+            <h3 class="form-section-title">
+              <span class="material-icons">person</span>
+              Contact Details
+            </h3>
+            <div class="form-field">
+              <label for="contactPerson">Contact Person *</label>
+              <input type="text" id="contactPerson" name="contactPerson" required placeholder="Enter contact person name">
+            </div>
+            <div class="form-field">
+              <label for="phone">Phone Number *</label>
+              <input type="tel" id="phone" name="phone" required placeholder="Enter phone number" pattern="[0-9]{10}">
+            </div>
+          </div>
+
+          <div class="form-section">
+            <h3 class="form-section-title">
+              <span class="material-icons">location_on</span>
+              Location Details
+            </h3>
+            <div class="form-field">
+              <label for="area">Area *</label>
+              <input type="text" id="area" name="area" required placeholder="Enter area name">
+            </div>
+            <div class="form-field">
+              <label>Location (GPS)</label>
+              <div class="location-card" id="locationCard">
+                <div class="location-icon">
+                  <span class="material-icons">my_location</span>
+                </div>
+                <div class="location-info">
+                  <p id="locationStatus">Tap to get your location</p>
+                  <p class="location-coords" id="locationCoords"></p>
+                </div>
+                <button type="button" class="location-btn" id="getLocationBtn">
+                  <span class="material-icons"> gps_fixed</span>
+                  Get Location
+                </button>
+              </div>
+              <input type="hidden" id="latitude" name="latitude">
+              <input type="hidden" id="longitude" name="longitude">
+              <input type="hidden" id="locationAddress" name="locationAddress">
+            </div>
+          </div>
+
+          <div class="form-section">
+            <h3 class="form-section-title">
+              <span class="material-icons">engineering</span>
+              Machine Details
+            </h3>
+            <div class="form-field">
+              <label for="machineModel">Machine Model *</label>
+              <input type="text" id="machineModel" name="machineModel" required placeholder="Enter machine model">
+            </div>
+            <div class="form-field">
+              <label for="price">Price (₹) *</label>
+              <input type="number" id="price" name="price" required placeholder="Enter price" min="0">
+            </div>
+          </div>
+
+          <div class="form-section">
+            <h3 class="form-section-title">
+              <span class="material-icons">note</span>
+              Additional Notes
+            </h3>
+            <div class="form-field">
+              <textarea id="notes" name="notes" rows="3" placeholder="Enter any additional notes"></textarea>
+            </div>
+          </div>
+
+          <div class="form-actions">
+            <button type="button" class="btn btn-outlined" onclick="resetForm()">Clear</button>
+            <button type="submit" class="btn btn-primary" id="submitBtn">
+              <span class="material-icons">save</span>
+              Save Lead
+            </button>
+          </div>
+        </form>
+      </section>
+
+      <!-- Leads List Page -->
+      <section class="page" id="leadsPage">
+        <div class="filter-chips">
+          <button class="chip active" data-filter="all">All</button>
+          <button class="chip" data-filter="New Lead">Leads</button>
+          <button class="chip" data-filter="Enquiry">Enquiries</button>
+          <button class="chip" data-filter="Converted">Converted</button>
+        </div>
+        <div class="leads-list" id="leadsList">
+          <!-- Dynamic content -->
+        </div>
+      </section>
+
+      <!-- Enquiries Page -->
+      <section class="page" id="enquiriesPage">
+        <div class="empty-state" id="enquiriesEmpty">
+          <span class="material-icons">help_outline</span>
+          <h3>No Enquiries Yet</h3>
+          <p>Leads marked as enquiries will appear here</p>
+        </div>
+        <div class="leads-list" id="enquiriesList"></div>
+      </section>
+
+      <!-- Conversions Page -->
+      <section class="page" id="conversionsPage">
+        <div class="empty-state" id="conversionsEmpty">
+          <span class="material-icons">check_circle</span>
+          <h3>No Conversions Yet</h3>
+          <p>Successfully converted leads will appear here</p>
+        </div>
+        <div class="leads-list" id="conversionsList"></div>
+      </section>
+
+      <!-- Settings Page -->
+      <section class="page" id="settingsPage">
+        <div class="settings-list">
+          <div class="settings-item">
+            <div class="settings-icon">
+              <span class="material-icons">link</span>
+            </div>
+            <div class="settings-info">
+              <h4>API Endpoint</h4>
+              <p class="settings-value" id="apiEndpoint">Not configured</p>
+            </div>
+          </div>
+          <div class="settings-item">
+            <div class="settings-icon">
+              <span class="material-icons">sync</span>
+            </div>
+            <div class="settings-info">
+              <h4>Sync Data</h4>
+              <p>Force refresh from server</p>
+            </div>
+            <button class="icon-btn" onclick="refreshData()">
+              <span class="material-icons">refresh</span>
+            </button>
+          </div>
+          <div class="settings-item">
+            <div class="settings-icon">
+              <span class="material-icons">info</span>
+            </div>
+            <div class="settings-info">
+              <h4>About</h4>
+              <p>MacpowerCRM v1.0.0</p>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- FAB (Floating Action Button) -->
+    <button class="fab" id="fabBtn" onclick="navigateTo('addLead')">
+      <span class="material-icons">add</span>
+    </button>
+
+    <!-- Bottom Navigation -->
+    <nav class="bottom-nav">
+      <button class="nav-item active" data-page="dashboard">
+        <span class="material-icons">dashboard</span>
+        <span>Dashboard</span>
+      </button>
+      <button class="nav-item" data-page="leads">
+        <span class="material-icons">people</span>
+        <span>Leads</span>
+      </button>
+      <button class="nav-item" data-page="addLead">
+        <span class="material-icons">add_circle</span>
+        <span>New Lead</span>
+      </button>
+      <button class="nav-item" data-page="conversions">
+        <span class="material-icons">check_circle</span>
+        <span>Converted</span>
+      </button>
+    </nav>
+  </div>
+
+  <!-- Snackbar for notifications -->
+  <div class="snackbar" id="snackbar">
+    <p id="snackbarText"></p>
+    <button class="snackbar-action" onclick="hideSnackbar()">DISMISS</button>
+  </div>
+
+  <!-- Lead Detail Modal -->
+  <div class="modal" id="leadModal" style="display: none;">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>Lead Details</h2>
+        <button class="icon-btn" onclick="closeModal()">
+          <span class="material-icons">close</span>
+        </button>
+      </div>
+      <div class="modal-body" id="modalBody">
+        <!-- Dynamic content -->
+      </div>
+      <div class="modal-actions" id="modalActions">
+        <!-- Dynamic buttons -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading Overlay -->
+  <div class="loading-overlay" id="loadingOverlay" style="display: none;">
+    <div class="loading-spinner"></div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
