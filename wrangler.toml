@@ -11,7 +11,7 @@ database_id = "0b8d2b6a-f91b-423c-877b-e97d1ae39419"
 # Environment variables
 [vars]
 APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwUnvDK2g1_lA8kufwSrkjJvTXAGkddnIpJwhJ5wWa1oWs4zWI-LEFFHGPuIFLw2M6CDQ/exec"
-CLERK_ISSUER_DOMAIN = "subtle-clayfish-93.clerk.accounts.dev"
+CLERK_ISSUER_DOMAIN = "subtle-crayfish-93.clerk.accounts.dev"
 
 # Cron trigger - sync every 1 minute
 [triggers]

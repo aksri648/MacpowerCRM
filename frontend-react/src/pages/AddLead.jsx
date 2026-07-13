@@ -1,7 +1,5 @@
 import { useState, useContext } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Capacitor } from '@capacitor/core'
-import { Geolocation } from '@capacitor/geolocation'
 import { addLead } from '../api'
 import { SnackbarContext } from '../App'
 import Loading from '../components/Loading'
@@ -24,32 +22,17 @@ export default function AddLead() {
     setLocation(prev => ({ ...prev, loading: true }))
 
     try {
-      let latitude, longitude
-
-      if (Capacitor.isNativePlatform()) {
-        // Native: use Capacitor plugin for proper Android permissions
-        const permStatus = await Geolocation.requestPermissions()
-        if (permStatus.location !== 'granted') {
-          showSnackbar('Location permission denied')
-          setLocation(prev => ({ ...prev, loading: false }))
-          return
-        }
-        const pos = await Geolocation.getCurrentPosition({ enableHighAccuracy: true, timeout: 10000 })
-        latitude = pos.coords.latitude
-        longitude = pos.coords.longitude
-      } else {
-        // Web: use browser geolocation API
-        if (!navigator.geolocation) {
-          showSnackbar('Geolocation not supported')
-          setLocation(prev => ({ ...prev, loading: false }))
-          return
-        }
-        const pos = await new Promise((resolve, reject) => {
-          navigator.geolocation.getCurrentPosition(resolve, reject, { enableHighAccuracy: true, timeout: 10000 })
-        })
-        latitude = pos.coords.latitude
-        longitude = pos.coords.longitude
+      // Use the browser geolocation API
+      if (!navigator.geolocation) {
+        showSnackbar('Geolocation not supported')
+        setLocation(prev => ({ ...prev, loading: false }))
+        return
       }
+      const pos = await new Promise((resolve, reject) => {
+        navigator.geolocation.getCurrentPosition(resolve, reject, { enableHighAccuracy: true, timeout: 10000 })
+      })
+      const latitude = pos.coords.latitude
+      const longitude = pos.coords.longitude
 
       // Reverse geocode
       let addr = `${latitude}, ${longitude}`

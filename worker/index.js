@@ -198,9 +198,9 @@ async function registerUser(env, params, clerkUserId) {
     return { success: false, message: 'Username and email are required' }
   }
 
-  // Validate username format (alphanumeric, underscores, 3-30 chars)
-  if (!/^[a-z0-9_]{3,30}$/.test(username)) {
-    return { success: false, message: 'Username must be 3-30 characters, lowercase letters, numbers, and underscores only' }
+  // Validate username format (alphanumeric, underscores, hyphens, 3-30 chars)
+  if (!/^[a-z0-9_\-]{3,30}$/.test(username)) {
+    return { success: false, message: 'Username must be 3-30 characters, lowercase letters, numbers, underscores, and hyphens only' }
   }
 
   // Check if user already registered

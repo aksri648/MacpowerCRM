@@ -9,6 +9,7 @@ import Loading from '../components/Loading'
 export default function Dashboard() {
   const [stats, setStats] = useState(null)
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(null)
   const [selectedLead, setSelectedLead] = useState(null)
   const [shareTarget, setShareTarget] = useState(null)
   const navigate = useNavigate()
@@ -19,8 +20,20 @@ export default function Dashboard() {
 
   async function loadDashboard() {
     setLoading(true)
-    const res = await getDashboard()
-    if (res.success) setStats(res.dashboard)
+    setError(null)
+    try {
+      const res = await getDashboard()
+      if (res.success) {
+        setStats(res.dashboard)
+      } else {
+        setError(res.message || 'Failed to load dashboard')
+        // Show empty dashboard on error
+        setStats({ totalLeads: 0, totalEnquiries: 0, totalConversions: 0, sharedWithMeCount: 0, recentLeads: [] })
+      }
+    } catch (err) {
+      setError('Network error. Please try again.')
+      setStats({ totalLeads: 0, totalEnquiries: 0, totalConversions: 0, sharedWithMeCount: 0, recentLeads: [] })
+    }
     setLoading(false)
   }
 
@@ -45,6 +58,14 @@ export default function Dashboard() {
   return (
     <>
       <Loading show={loading} />
+
+      {error && (
+        <div className="auth-error" style={{ margin: '16px 0' }}>
+          <span className="material-icons">error_outline</span>
+          {error}
+        </div>
+      )}
+
       {stats && (
         <>
           <div className="stats-grid">

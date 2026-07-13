@@ -1,6 +1,6 @@
 import { useState, createContext, useContext, useEffect } from 'react'
 import { Routes, Route, useNavigate, useLocation, Navigate } from 'react-router-dom'
-import { useAuth, useUser } from '@clerk/clerk-react'
+import { useAuth, useUser, SignedIn, SignedOut } from '@clerk/clerk-react'
 import { useApiToken } from './hooks/useApiToken'
 import Dashboard from './pages/Dashboard'
 import AddLead from './pages/AddLead'
@@ -8,13 +8,11 @@ import Leads from './pages/Leads'
 import Enquiries from './pages/Enquiries'
 import Conversions from './pages/Conversions'
 import Settings from './pages/Settings'
+import SharedWithMe from './pages/SharedWithMe'
 import SignIn from './pages/SignIn'
 import SignUp from './pages/SignUp'
-import CompleteProfile from './pages/CompleteProfile'
-import SharedWithMe from './pages/SharedWithMe'
 import SideDrawer from './components/SideDrawer'
 import Snackbar from './components/Snackbar'
-import ProtectedRoute from './components/ProtectedRoute'
 import Loading from './components/Loading'
 import './index.css'
 
@@ -32,53 +30,143 @@ const PAGE_TITLES = {
   '/conversions': 'Conversions',
   '/settings': 'Settings',
   '/shared-with-me': 'Shared With Me',
-  '/complete-profile': 'Complete Profile',
 }
 
-// Component that checks if user has completed profile registration
-function RequireProfile({ children }) {
+// Component that auto-registers user in our DB using Clerk's username/email
+function EnsureRegistered({ children }) {
   const { getToken } = useAuth()
-  const { user } = useUser()
-  const [checking, setChecking] = useState(true)
-  const [registered, setRegistered] = useState(false)
-  const navigate = useNavigate()
+  const { user, isLoaded: isUserLoaded } = useUser()
+  const [ready, setReady] = useState(false)
 
   useEffect(() => {
-    async function checkProfile() {
+    // Wait until Clerk has loaded user data
+    if (!isUserLoaded) return
+
+    // If no user object after loading, skip registration (shouldn't happen inside SignedIn)
+    if (!user) {
+      setReady(true)
+      return
+    }
+
+    async function ensureUser() {
       try {
         const token = await getToken()
+        if (!token) {
+          setReady(true)
+          return
+        }
+
         const API_BASE = import.meta.env.VITE_API_URL || 'https://macpower-crm-api.akshatsri648.workers.dev'
-        const url = new URL(API_BASE)
-        url.searchParams.set('action', 'getMe')
-        const res = await fetch(url.toString(), {
+
+        // Check if already registered
+        const checkUrl = new URL(API_BASE)
+        checkUrl.searchParams.set('action', 'getMe')
+        const checkRes = await fetch(checkUrl.toString(), {
           headers: { 'Authorization': `Bearer ${token}` }
         })
-        const data = await res.json()
-        if (data.success && data.registered) {
-          setRegistered(true)
-        } else {
-          navigate('/complete-profile', { replace: true })
-        }
-      } catch {
-        // On error, allow through - the API calls will fail with proper error
-        setRegistered(true)
-      }
-      setChecking(false)
-    }
-    if (user) checkProfile()
-  }, [user])
+        const checkData = await checkRes.json()
 
-  if (checking) return <Loading show={true} />
-  if (!registered) return null
+        if (checkData.success && checkData.registered) {
+          setReady(true)
+          return
+        }
+
+        // Not registered yet — auto-register using Clerk profile data
+        const username = user.username || user.primaryEmailAddress?.emailAddress?.split('@')[0] || ''
+        const email = user.primaryEmailAddress?.emailAddress || ''
+        const fullName = user.fullName || `${user.firstName || ''} ${user.lastName || ''}`.trim()
+
+        const regUrl = new URL(API_BASE)
+        regUrl.searchParams.set('action', 'registerUser')
+        regUrl.searchParams.set('username', username.toLowerCase().replace(/[^a-z0-9_]/g, '_').slice(0, 30))
+        regUrl.searchParams.set('email', email.toLowerCase())
+        regUrl.searchParams.set('fullName', fullName)
+
+        await fetch(regUrl.toString(), {
+          headers: { 'Authorization': `Bearer ${token}` }
+        })
+      } catch {
+        // Allow through on error — API calls will fail with proper error
+      }
+      setReady(true)
+    }
+
+    ensureUser()
+  }, [user, isUserLoaded])
+
+  if (!ready) return <Loading show={true} />
   return children
 }
 
-export default function App() {
+// The authenticated application shell (header, nav, routed pages)
+function AppShell() {
   const [drawerOpen, setDrawerOpen] = useState(false)
-  const [snackbar, setSnackbar] = useState({ open: false, message: '' })
   const navigate = useNavigate()
   const location = useLocation()
-  const { isSignedIn, isLoaded } = useAuth()
+
+  const title = PAGE_TITLES[location.pathname] || 'MacpowerCRM'
+
+  return (
+    <div className="app-container">
+      <header className="top-bar">
+        <button className="icon-btn" onClick={() => setDrawerOpen(true)}>
+          <span className="material-icons">menu</span>
+        </button>
+        <h1 className="top-bar-title">{title}</h1>
+      </header>
+
+      <SideDrawer
+        open={drawerOpen}
+        onClose={() => setDrawerOpen(false)}
+        onNavigate={(path) => { navigate(path); setDrawerOpen(false) }}
+        currentPath={location.pathname}
+      />
+
+      <main className="main-content">
+        <EnsureRegistered>
+          <Routes>
+            <Route path="/" element={<Dashboard />} />
+            <Route path="/add-lead" element={<AddLead />} />
+            <Route path="/leads" element={<Leads />} />
+            <Route path="/enquiries" element={<Enquiries />} />
+            <Route path="/conversions" element={<Conversions />} />
+            <Route path="/settings" element={<Settings />} />
+            <Route path="/shared-with-me" element={<SharedWithMe />} />
+            <Route path="*" element={<Navigate to="/" replace />} />
+          </Routes>
+        </EnsureRegistered>
+      </main>
+
+      {!['/add-lead', '/settings', '/conversions', '/enquiries', '/shared-with-me'].includes(location.pathname) && (
+        <button className="fab" onClick={() => navigate('/add-lead')}>
+          <span className="material-icons">add</span>
+        </button>
+      )}
+
+      <nav className="bottom-nav">
+        {[
+          { path: '/', icon: 'dashboard', label: 'Dashboard' },
+          { path: '/leads', icon: 'people', label: 'Leads' },
+          { path: '/add-lead', icon: 'add_circle', label: 'New Lead' },
+          { path: '/shared-with-me', icon: 'share', label: 'Shared' },
+        ].map(item => (
+          <button
+            key={item.path}
+            className={`nav-item ${location.pathname === item.path ? 'active' : ''}`}
+            onClick={() => navigate(item.path)}
+          >
+            <span className="material-icons">{item.icon}</span>
+            <span>{item.label}</span>
+          </button>
+        ))}
+      </nav>
+    </div>
+  )
+}
+
+export default function App() {
+  const [snackbar, setSnackbar] = useState({ open: false, message: '' })
+  const { isLoaded } = useAuth()
 
   // Connect Clerk auth token to API layer
   useApiToken()
@@ -88,113 +176,39 @@ export default function App() {
     setTimeout(() => setSnackbar({ open: false, message: '' }), 3000)
   }
 
-  const title = PAGE_TITLES[location.pathname] || 'MacpowerCRM'
-
-  // Auth pages don't show the app shell
-  const isAuthPage = ['/sign-in', '/sign-up'].includes(location.pathname)
-  const isProfilePage = location.pathname === '/complete-profile'
-
   if (!isLoaded) return <Loading show={true} />
 
   return (
     <SnackbarContext.Provider value={showSnackbar}>
-      <div className="app-container">
-        {/* Show app shell only for authenticated non-auth pages */}
-        {!isAuthPage && !isProfilePage && isSignedIn && (
+      <Routes>
+        {/* Public auth routes — hosted on our own domain */}
+        <Route path="/sign-in/*" element={
           <>
-            <header className="top-bar">
-              <button className="icon-btn" onClick={() => setDrawerOpen(true)}>
-                <span className="material-icons">menu</span>
-              </button>
-              <h1 className="top-bar-title">{title}</h1>
-            </header>
-
-            <SideDrawer
-              open={drawerOpen}
-              onClose={() => setDrawerOpen(false)}
-              onNavigate={(path) => { navigate(path); setDrawerOpen(false) }}
-              currentPath={location.pathname}
-            />
+            <SignedIn><Navigate to="/" replace /></SignedIn>
+            <SignedOut><SignIn /></SignedOut>
           </>
-        )}
-
-        <main className={isAuthPage || isProfilePage ? 'main-content auth-main' : 'main-content'}>
-          <Routes>
-            {/* Public auth routes */}
-            <Route path="/sign-in/*" element={
-              isSignedIn ? <Navigate to="/" replace /> : <SignIn />
-            } />
-            <Route path="/sign-up/*" element={
-              isSignedIn ? <Navigate to="/" replace /> : <SignUp />
-            } />
-
-            {/* Profile completion (auth required but no profile check) */}
-            <Route path="/complete-profile" element={
-              <ProtectedRoute><CompleteProfile /></ProtectedRoute>
-            } />
-
-            {/* Protected routes (auth + profile required) */}
-            <Route path="/" element={
-              <ProtectedRoute><RequireProfile><Dashboard /></RequireProfile></ProtectedRoute>
-            } />
-            <Route path="/add-lead" element={
-              <ProtectedRoute><RequireProfile><AddLead /></RequireProfile></ProtectedRoute>
-            } />
-            <Route path="/leads" element={
-              <ProtectedRoute><RequireProfile><Leads /></RequireProfile></ProtectedRoute>
-            } />
-            <Route path="/enquiries" element={
-              <ProtectedRoute><RequireProfile><Enquiries /></RequireProfile></ProtectedRoute>
-            } />
-            <Route path="/conversions" element={
-              <ProtectedRoute><RequireProfile><Conversions /></RequireProfile></ProtectedRoute>
-            } />
-            <Route path="/settings" element={
-              <ProtectedRoute><RequireProfile><Settings /></RequireProfile></ProtectedRoute>
-            } />
-            <Route path="/shared-with-me" element={
-              <ProtectedRoute><RequireProfile><SharedWithMe /></RequireProfile></ProtectedRoute>
-            } />
-
-            {/* Catch-all */}
-            <Route path="*" element={<Navigate to="/" replace />} />
-          </Routes>
-        </main>
-
-        {/* FAB and bottom nav only for authenticated users on non-auth pages */}
-        {!isAuthPage && !isProfilePage && isSignedIn && (
+        } />
+        <Route path="/sign-up/*" element={
           <>
-            <button className="fab" onClick={() => navigate('/add-lead')}
-              style={{ display: location.pathname === '/add-lead' ? 'none' : 'flex' }}>
-              <span className="material-icons">add</span>
-            </button>
-
-            <nav className="bottom-nav">
-              {[
-                { path: '/', icon: 'dashboard', label: 'Dashboard' },
-                { path: '/leads', icon: 'people', label: 'Leads' },
-                { path: '/add-lead', icon: 'add_circle', label: 'New Lead' },
-                { path: '/shared-with-me', icon: 'share', label: 'Shared' },
-              ].map(item => (
-                <button
-                  key={item.path}
-                  className={`nav-item ${location.pathname === item.path ? 'active' : ''}`}
-                  onClick={() => navigate(item.path)}
-                >
-                  <span className="material-icons">{item.icon}</span>
-                  <span>{item.label}</span>
-                </button>
-              ))}
-            </nav>
+            <SignedIn><Navigate to="/" replace /></SignedIn>
+            <SignedOut><SignUp /></SignedOut>
           </>
-        )}
+        } />
 
-        <Snackbar
-          open={snackbar.open}
-          message={snackbar.message}
-          onClose={() => setSnackbar({ open: false, message: '' })}
-        />
-      </div>
+        {/* Everything else: app if signed in, else redirect to our /sign-in */}
+        <Route path="/*" element={
+          <>
+            <SignedIn><AppShell /></SignedIn>
+            <SignedOut><Navigate to="/sign-in" replace /></SignedOut>
+          </>
+        } />
+      </Routes>
+
+      <Snackbar
+        open={snackbar.open}
+        message={snackbar.message}
+        onClose={() => setSnackbar({ open: false, message: '' })}
+      />
     </SnackbarContext.Provider>
   )
 }
