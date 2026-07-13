@@ -5,8 +5,7 @@
 
 // ==================== Configuration ====================
 const CONFIG = {
-  // Replace with your Google Apps Script deployment URL
-  API_URL: localStorage.getItem('crm_api_url') || '',
+  API_URL: 'https://script.google.com/macros/s/AKfycbzZ4zdPnG2Si673g6kSJyv2-iuPNURPqOj5NVnNH8CsoftN8jajAGHawqxGli-b2MX3og/exec',
   STORAGE_KEY: 'macpower_crm_data'
 };
 
@@ -76,20 +75,8 @@ function initializeEventListeners() {
   // Location button
   document.getElementById('getLocationBtn').addEventListener('click', getCurrentLocation);
 
-  // Show API URL input on first load
-  if (!CONFIG.API_URL) {
-    setTimeout(() => {
-      const url = prompt('Enter your Google Apps Script deployment URL:');
-      if (url) {
-        CONFIG.API_URL = url;
-        localStorage.setItem('crm_api_url', url);
-        document.getElementById('apiEndpoint').textContent = url;
-        loadDashboard();
-      }
-    }, 2500);
-  } else {
-    document.getElementById('apiEndpoint').textContent = CONFIG.API_URL;
-  }
+  // Show API endpoint in settings
+  document.getElementById('apiEndpoint').textContent = CONFIG.API_URL;
 }
 
 // ==================== Navigation ====================
