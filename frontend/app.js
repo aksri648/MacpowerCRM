@@ -5,7 +5,7 @@
 
 // ==================== Configuration ====================
 const CONFIG = {
-  API_URL: 'https://script.google.com/macros/s/AKfycbzZ4zdPnG2Si673g6kSJyv2-iuPNURPqOj5NVnNH8CsoftN8jajAGHawqxGli-b2MX3og/exec',
+  API_URL: 'https://script.google.com/macros/s/AKfycbz5yTPVxnSz9MgPtPp8pVf7nnHIAB5JdW3NDo34RDMwCMPG_lQLxpyQC_BKkaByQOxzgw/exec',
   STORAGE_KEY: 'macpower_crm_data'
 };
 
@@ -170,18 +170,17 @@ async function apiCall(action, method = 'GET', data = null) {
 
   try {
     let url = `${CONFIG.API_URL}?action=${action}`;
-    const options = {
-      method: method,
-      headers: {
-        'Content-Type': 'application/json'
-      }
-    };
-
-    if (data && method === 'POST') {
-      options.body = JSON.stringify({ action, ...data });
+    
+    // Add data as query params (avoids CORS issues with Apps Script)
+    if (data) {
+      Object.keys(data).forEach(key => {
+        if (data[key] !== null && data[key] !== undefined) {
+          url += `&${key}=${encodeURIComponent(data[key])}`;
+        }
+      });
     }
 
-    const response = await fetch(url, options);
+    const response = await fetch(url);
     const result = await response.json();
     return result;
   } catch (error) {

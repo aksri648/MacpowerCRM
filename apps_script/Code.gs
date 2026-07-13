@@ -76,6 +76,7 @@ function doGet(e) {
     const action = e.parameter.action;
     
     switch(action) {
+      // Read operations
       case 'getLeads':
         return getLeads(e.parameter);
       case 'getDashboard':
@@ -84,6 +85,17 @@ function doGet(e) {
         return getLead(e.parameter.id);
       case 'searchLeads':
         return searchLeads(e.parameter.query);
+      
+      // Write operations (via GET to avoid CORS)
+      case 'addLead':
+        return addLead(e.parameter);
+      case 'updateLead':
+        return updateLead(e.parameter);
+      case 'deleteLead':
+        return deleteLead(e.parameter);
+      case 'convertLead':
+        return convertLead(e.parameter);
+      
       default:
         return jsonResponse({ success: false, message: 'Invalid action' });
     }
