@@ -1,0 +1,89 @@
+name: Build Android APK
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      release_name:
+        description: 'Release name (e.g., v1.0.0)'
+        required: false
+        default: 'manual-build'
+
+jobs:
+  build:
+    name: Build APK
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: frontend-react/package-lock.json
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Install dependencies
+        working-directory: frontend-react
+        run: npm ci
+
+      - name: Build React app with production API URL
+        working-directory: frontend-react
+        run: VITE_API_URL=https://macpower-crm-api.akshatsri648.workers.dev npx vite build
+
+      - name: Sync Capacitor
+        working-directory: frontend-react
+        run: npx cap sync android
+
+      - name: Make Gradle wrapper executable
+        run: chmod +x frontend-react/android/gradlew
+
+      - name: Build debug APK
+        working-directory: frontend-react/android
+        run: ./gradlew assembleDebug
+
+      - name: Rename APK
+        run: |
+          VERSION="${GITHUB_REF_NAME:-${{ github.event.inputs.release_name || 'dev' }}}"
+          cp frontend-react/android/app/build/outputs/apk/debug/app-debug.apk \
+             frontend-react/android/app/build/outputs/apk/debug/MacpowerCRM-${VERSION}.apk
+
+      - name: Upload APK artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: MacpowerCRM-APK
+          path: frontend-react/android/app/build/outputs/apk/debug/MacpowerCRM-*.apk
+          retention-days: 30
+
+      - name: Create GitHub Release
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: frontend-react/android/app/build/outputs/apk/debug/MacpowerCRM-*.apk
+          generate_release_notes: true
+          name: "MacpowerCRM ${{ github.ref_name }}"
+          body: |
+            ## 📱 MacpowerCRM Android App
+
+            ### Download
+            Download the APK file below and install it on your Android device.
+
+            ### What's included
+            - Full CRM functionality (Dashboard, Leads, Enquiries, Conversions)
+            - GPS location capture for leads
+            - Real-time sync with Cloudflare D1 backend
+
+            > **Note:** You may need to enable "Install from unknown sources" in your Android settings.

@@ -1,5 +1,7 @@
 import { useState, useContext } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { Capacitor } from '@capacitor/core'
+import { Geolocation } from '@capacitor/geolocation'
 import { addLead } from '../api'
 import { SnackbarContext } from '../App'
 import Loading from '../components/Loading'
@@ -19,29 +21,49 @@ export default function AddLead() {
   }
 
   async function handleGetLocation() {
-    if (!navigator.geolocation) {
-      showSnackbar('Geolocation not supported')
-      return
-    }
     setLocation(prev => ({ ...prev, loading: true }))
-    navigator.geolocation.getCurrentPosition(
-      async (pos) => {
-        const { latitude, longitude } = pos.coords
-        let addr = `${latitude}, ${longitude}`
-        try {
-          const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`)
-          const data = await res.json()
-          if (data.display_name) addr = data.display_name
-        } catch {}
-        setLocation({ lat: latitude, lng: longitude, address: addr, loading: false })
-        showSnackbar('Location captured')
-      },
-      () => {
-        setLocation(prev => ({ ...prev, loading: false }))
-        showSnackbar('Unable to get location')
-      },
-      { enableHighAccuracy: true, timeout: 10000 }
-    )
+
+    try {
+      let latitude, longitude
+
+      if (Capacitor.isNativePlatform()) {
+        // Native: use Capacitor plugin for proper Android permissions
+        const permStatus = await Geolocation.requestPermissions()
+        if (permStatus.location !== 'granted') {
+          showSnackbar('Location permission denied')
+          setLocation(prev => ({ ...prev, loading: false }))
+          return
+        }
+        const pos = await Geolocation.getCurrentPosition({ enableHighAccuracy: true, timeout: 10000 })
+        latitude = pos.coords.latitude
+        longitude = pos.coords.longitude
+      } else {
+        // Web: use browser geolocation API
+        if (!navigator.geolocation) {
+          showSnackbar('Geolocation not supported')
+          setLocation(prev => ({ ...prev, loading: false }))
+          return
+        }
+        const pos = await new Promise((resolve, reject) => {
+          navigator.geolocation.getCurrentPosition(resolve, reject, { enableHighAccuracy: true, timeout: 10000 })
+        })
+        latitude = pos.coords.latitude
+        longitude = pos.coords.longitude
+      }
+
+      // Reverse geocode
+      let addr = `${latitude}, ${longitude}`
+      try {
+        const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`)
+        const data = await res.json()
+        if (data.display_name) addr = data.display_name
+      } catch {}
+      setLocation({ lat: latitude, lng: longitude, address: addr, loading: false })
+      showSnackbar('Location captured')
+    } catch {
+      setLocation(prev => ({ ...prev, loading: false }))
+      showSnackbar('Unable to get location')
+    }
   }
 
   async function handleSubmit(e) {
