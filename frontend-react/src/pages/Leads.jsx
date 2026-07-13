@@ -3,6 +3,7 @@ import { getLeads, deleteLead, convertLead, updateLead } from '../api'
 import { SnackbarContext } from '../App'
 import LeadCard from '../components/LeadCard'
 import LeadModal from '../components/LeadModal'
+import ShareLeadModal from '../components/ShareLeadModal'
 import Loading from '../components/Loading'
 
 export default function Leads() {
@@ -11,6 +12,7 @@ export default function Leads() {
   const [filtered, setFiltered] = useState([])
   const [filter, setFilter] = useState('all')
   const [selected, setSelected] = useState(null)
+  const [shareTarget, setShareTarget] = useState(null)
   const [loading, setLoading] = useState(true)
 
   useEffect(() => { loadLeads() }, [])
@@ -39,7 +41,7 @@ export default function Leads() {
 
   async function handleUpdateStatus(id, status) {
     setLoading(true)
-    const res = await updateLead({ leadId: id, status })
+    const res = await updateLead(id, { status })
     if (res.success) { showSnackbar('Status updated'); setSelected(null); loadLeads() }
     setLoading(false)
   }
@@ -69,11 +71,19 @@ export default function Leads() {
             <h3>No Results</h3>
           </div>
         ) : (
-          filtered.map(lead => <LeadCard key={lead.id} lead={lead} onClick={setSelected} />)
+          filtered.map(lead => (
+            <LeadCard
+              key={lead.id}
+              lead={lead}
+              onClick={setSelected}
+              onShare={setShareTarget}
+            />
+          ))
         )}
       </div>
       <LeadModal lead={selected} onClose={() => setSelected(null)}
         onConvert={handleConvert} onUpdateStatus={handleUpdateStatus} onDelete={handleDelete} />
+      <ShareLeadModal lead={shareTarget} onClose={() => setShareTarget(null)} onShared={loadLeads} />
     </>
   )
 }

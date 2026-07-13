@@ -1143,3 +1143,515 @@ html, body {
 .main-content::-webkit-scrollbar-thumb:hover {
   background: var(--on-surface-variant);
 }
+
+
+
+/* ==================== Auth Pages ==================== */
+.auth-page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+  padding: 24px;
+}
+
+.auth-main {
+  padding: 0 !important;
+  padding-bottom: 0 !important;
+}
+
+.auth-container {
+  width: 100%;
+  max-width: 420px;
+  background: var(--surface);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-3);
+  padding: 32px 24px;
+  animation: modalSlideIn 0.4s ease;
+}
+
+.auth-header {
+  text-align: center;
+  margin-bottom: 24px;
+}
+
+.auth-logo {
+  width: 72px;
+  height: 72px;
+  background: var(--primary-light);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 16px;
+}
+
+.auth-logo .material-icons {
+  font-size: 36px;
+  color: var(--primary);
+}
+
+.auth-header h1 {
+  font-size: 24px;
+  font-weight: 500;
+  color: var(--on-surface);
+  margin-bottom: 8px;
+}
+
+.auth-header p {
+  font-size: 14px;
+  color: var(--on-surface-variant);
+}
+
+.auth-footer {
+  text-align: center;
+  margin-top: 20px;
+  font-size: 14px;
+  color: var(--on-surface-variant);
+}
+
+.auth-footer a {
+  color: var(--primary);
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.auth-footer a:hover {
+  text-decoration: underline;
+}
+
+.auth-error {
+  background: #fce8e6;
+  color: var(--error);
+  padding: 10px 14px;
+  border-radius: var(--radius-sm);
+  font-size: 13px;
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Clerk component overrides */
+.clerk-root-box {
+  width: 100%;
+}
+
+.clerk-card {
+  box-shadow: none !important;
+  border: none !important;
+  padding: 0 !important;
+}
+
+/* ==================== Profile Form ==================== */
+.profile-form {
+  margin-top: 16px;
+}
+
+.profile-form .form-field {
+  margin-bottom: 16px;
+}
+
+.profile-form .form-field label {
+  display: block;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--on-surface-variant);
+  margin-bottom: 8px;
+}
+
+.profile-form .form-field input {
+  width: 100%;
+  padding: 12px 16px;
+  border: 1px solid var(--outline);
+  border-radius: var(--radius-sm);
+  font-size: 16px;
+  background: var(--surface);
+  color: var(--on-surface);
+  transition: border-color var(--transition), box-shadow var(--transition);
+}
+
+.profile-form .form-field input:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 2px var(--primary-light);
+}
+
+.field-hint {
+  font-size: 11px;
+  color: var(--on-surface-variant);
+  margin-top: 6px;
+}
+
+.btn-full {
+  width: 100%;
+}
+
+/* ==================== Share Button (Green Dot) ==================== */
+.lead-card-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.share-dot-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: none;
+  background: var(--secondary);
+  color: white;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform var(--transition), box-shadow var(--transition);
+  box-shadow: 0 2px 4px rgba(52, 168, 83, 0.3);
+}
+
+.share-dot-btn:hover {
+  transform: scale(1.1);
+  box-shadow: 0 3px 8px rgba(52, 168, 83, 0.4);
+}
+
+.share-dot-btn:active {
+  transform: scale(0.95);
+}
+
+.share-dot-btn .material-icons {
+  font-size: 18px;
+}
+
+/* ==================== Shared By Badge ==================== */
+.shared-by-badge {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  background: var(--primary-light);
+  border-radius: 100px;
+  font-size: 11px;
+  color: var(--primary);
+  font-weight: 500;
+  margin-bottom: 10px;
+  width: fit-content;
+}
+
+.shared-by-badge .material-icons {
+  font-size: 14px;
+}
+
+/* ==================== Share Modal ==================== */
+.share-modal {
+  max-width: 440px;
+}
+
+.share-lead-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  background: var(--background);
+  border-bottom: 1px solid var(--outline);
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--on-surface);
+}
+
+.share-lead-info .material-icons {
+  font-size: 20px;
+  color: var(--primary);
+}
+
+.share-form {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.share-input-group {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 12px;
+  border: 1px solid var(--outline);
+  border-radius: var(--radius-sm);
+  transition: border-color var(--transition), box-shadow var(--transition);
+}
+
+.share-input-group:focus-within {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 2px var(--primary-light);
+}
+
+.share-input-icon {
+  font-size: 20px;
+  color: var(--on-surface-variant);
+}
+
+.share-input {
+  flex: 1;
+  border: none;
+  outline: none;
+  padding: 10px 0;
+  font-size: 14px;
+  background: transparent;
+}
+
+.btn-share {
+  flex: none;
+  padding: 10px 16px;
+  border-radius: var(--radius-sm);
+  font-size: 13px;
+}
+
+.btn-share .material-icons {
+  font-size: 18px;
+}
+
+.share-error {
+  background: #fce8e6;
+  color: var(--error);
+  padding: 8px 12px;
+  border-radius: var(--radius-sm);
+  font-size: 13px;
+  margin-bottom: 12px;
+}
+
+.share-searching {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px;
+  color: var(--on-surface-variant);
+  font-size: 13px;
+}
+
+.share-results {
+  margin-top: 8px;
+}
+
+.share-results-title {
+  font-size: 12px;
+  color: var(--on-surface-variant);
+  font-weight: 500;
+  margin-bottom: 8px;
+}
+
+.share-user-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: background var(--transition);
+}
+
+.share-user-item:hover {
+  background: var(--background);
+}
+
+.share-user-avatar {
+  width: 36px;
+  height: 36px;
+  background: var(--primary-light);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--primary);
+}
+
+.share-user-avatar .material-icons {
+  font-size: 20px;
+}
+
+.share-user-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.share-user-name {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--on-surface);
+}
+
+.share-user-handle {
+  font-size: 12px;
+  color: var(--on-surface-variant);
+}
+
+.btn-icon-small {
+  width: 32px;
+  height: 32px;
+  border: none;
+  background: var(--primary-light);
+  color: var(--primary);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background var(--transition);
+}
+
+.btn-icon-small:hover {
+  background: var(--primary);
+  color: white;
+}
+
+.btn-icon-small .material-icons {
+  font-size: 18px;
+}
+
+.share-no-results {
+  text-align: center;
+  padding: 16px;
+  color: var(--on-surface-variant);
+}
+
+.share-no-results .material-icons {
+  font-size: 36px;
+  opacity: 0.5;
+  margin-bottom: 8px;
+}
+
+.share-no-results p {
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+/* ==================== Shared With Section (in LeadModal) ==================== */
+.shared-info-banner {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  background: var(--primary-light);
+  border-radius: var(--radius-sm);
+  margin-bottom: 16px;
+  font-size: 13px;
+  color: var(--primary);
+}
+
+.shared-info-banner .material-icons {
+  font-size: 18px;
+}
+
+.shared-with-section {
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid var(--outline);
+}
+
+.shared-with-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--on-surface);
+  margin-bottom: 12px;
+}
+
+.shared-with-title .material-icons {
+  font-size: 20px;
+  color: var(--primary);
+}
+
+.shared-user-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--outline);
+}
+
+.shared-user-row:last-child {
+  border-bottom: none;
+}
+
+.shared-user-details {
+  display: flex;
+  flex-direction: column;
+}
+
+.shared-user-name {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--primary);
+}
+
+.shared-user-meta {
+  font-size: 11px;
+  color: var(--on-surface-variant);
+}
+
+.btn-danger-icon {
+  background: #fce8e6 !important;
+  color: var(--error) !important;
+}
+
+.btn-danger-icon:hover {
+  background: var(--error) !important;
+  color: white !important;
+}
+
+.shared-loading {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 0;
+  font-size: 13px;
+  color: var(--on-surface-variant);
+}
+
+/* Spinning animation for sync icon */
+.spinning {
+  animation: spin 1s linear infinite;
+}
+
+/* ==================== Drawer Footer (Sign Out) ==================== */
+.drawer-footer {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  padding: 16px;
+  border-top: 1px solid var(--outline);
+}
+
+.drawer-signout-btn {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 12px 16px;
+  border: none;
+  background: transparent;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--error);
+  transition: background var(--transition);
+}
+
+.drawer-signout-btn:hover {
+  background: #fce8e6;
+}
+
+.drawer-signout-btn .material-icons {
+  font-size: 22px;
+}
+
+.drawer-user-info {
+  font-size: 12px;
+  opacity: 0.9;
+  margin-top: 2px;
+}

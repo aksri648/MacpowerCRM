@@ -1,1 +1,6 @@
 .wrangler/
+
+
+# Environment files with secrets
+.env
+frontend-react/.env

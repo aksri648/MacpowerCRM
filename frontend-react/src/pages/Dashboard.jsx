@@ -3,12 +3,14 @@ import { useNavigate } from 'react-router-dom'
 import { getDashboard, convertLead, deleteLead, updateLead } from '../api'
 import LeadCard from '../components/LeadCard'
 import LeadModal from '../components/LeadModal'
+import ShareLeadModal from '../components/ShareLeadModal'
 import Loading from '../components/Loading'
 
 export default function Dashboard() {
   const [stats, setStats] = useState(null)
   const [loading, setLoading] = useState(true)
   const [selectedLead, setSelectedLead] = useState(null)
+  const [shareTarget, setShareTarget] = useState(null)
   const navigate = useNavigate()
 
   useEffect(() => {
@@ -59,8 +61,8 @@ export default function Dashboard() {
               <div className="stat-info"><h3>{stats.totalConversions}</h3><p>Conversions</p></div>
             </div>
             <div className="stat-card rate">
-              <div className="stat-icon"><span className="material-icons">trending_up</span></div>
-              <div className="stat-info"><h3>{stats.conversionRate}%</h3><p>Conversion Rate</p></div>
+              <div className="stat-icon"><span className="material-icons">share</span></div>
+              <div className="stat-info"><h3>{stats.sharedWithMeCount || 0}</h3><p>Shared With Me</p></div>
             </div>
           </div>
 
@@ -77,7 +79,12 @@ export default function Dashboard() {
               </div>
             ) : (
               stats.recentLeads.map(lead => (
-                <LeadCard key={lead.id} lead={lead} onClick={setSelectedLead} />
+                <LeadCard
+                  key={lead.id}
+                  lead={lead}
+                  onClick={setSelectedLead}
+                  onShare={setShareTarget}
+                />
               ))
             )}
           </div>
@@ -91,6 +98,7 @@ export default function Dashboard() {
         onUpdateStatus={handleUpdateStatus}
         onDelete={handleDelete}
       />
+      <ShareLeadModal lead={shareTarget} onClose={() => setShareTarget(null)} onShared={loadDashboard} />
     </>
   )
 }

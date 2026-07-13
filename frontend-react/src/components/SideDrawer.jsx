@@ -1,12 +1,23 @@
+import { useClerk, useUser } from '@clerk/clerk-react'
+
 export default function SideDrawer({ open, onClose, onNavigate, currentPath }) {
+  const { signOut } = useClerk()
+  const { user } = useUser()
+
   const items = [
     { path: '/', icon: 'dashboard', label: 'Dashboard' },
     { path: '/add-lead', icon: 'add_circle', label: 'Add Lead' },
     { path: '/leads', icon: 'people', label: 'All Leads' },
+    { path: '/shared-with-me', icon: 'share', label: 'Shared With Me' },
     { path: '/enquiries', icon: 'help_outline', label: 'Enquiries' },
     { path: '/conversions', icon: 'check_circle', label: 'Conversions' },
     { path: '/settings', icon: 'settings', label: 'Settings' },
   ]
+
+  function handleSignOut() {
+    signOut()
+    onClose()
+  }
 
   return (
     <>
@@ -17,7 +28,11 @@ export default function SideDrawer({ open, onClose, onNavigate, currentPath }) {
             <span className="material-icons">business_center</span>
           </div>
           <h2>MacpowerCRM</h2>
-          <p>Sales Management</p>
+          {user && (
+            <p className="drawer-user-info">
+              {user.fullName || user.primaryEmailAddress?.emailAddress || 'User'}
+            </p>
+          )}
         </div>
         <ul className="drawer-menu">
           {items.map(item => (
@@ -31,6 +46,12 @@ export default function SideDrawer({ open, onClose, onNavigate, currentPath }) {
             </li>
           ))}
         </ul>
+        <div className="drawer-footer">
+          <button className="drawer-signout-btn" onClick={handleSignOut}>
+            <span className="material-icons">logout</span>
+            <span>Sign Out</span>
+          </button>
+        </div>
       </nav>
     </>
   )

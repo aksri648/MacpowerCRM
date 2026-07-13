@@ -1,9 +1,39 @@
+import { useState, useEffect } from 'react'
+import { getLeadShares, unshareLead } from '../api'
+
 function formatPrice(price) {
   if (!price && price !== 0) return ''
   return Number(price).toLocaleString('en-IN')
 }
 
-export default function LeadModal({ lead, onClose, onConvert, onUpdateStatus, onDelete }) {
+export default function LeadModal({ lead, onClose, onConvert, onUpdateStatus, onDelete, isShared }) {
+  const [shares, setShares] = useState([])
+  const [loadingShares, setLoadingShares] = useState(false)
+
+  useEffect(() => {
+    if (lead && !isShared) {
+      loadShares()
+    } else {
+      setShares([])
+    }
+  }, [lead])
+
+  async function loadShares() {
+    if (!lead) return
+    setLoadingShares(true)
+    try {
+      const res = await getLeadShares(lead.id)
+      if (res.success) setShares(res.shares || [])
+    } catch {}
+    setLoadingShares(false)
+  }
+
+  async function handleUnshare(shareWithUserId) {
+    if (!confirm('Remove sharing for this user?')) return
+    const res = await unshareLead(lead.id, shareWithUserId)
+    if (res.success) loadShares()
+  }
+
   if (!lead) return null
 
   const details = [
@@ -30,6 +60,14 @@ export default function LeadModal({ lead, onClose, onConvert, onUpdateStatus, on
           </button>
         </div>
         <div className="modal-body">
+          {/* Shared by info for shared leads */}
+          {isShared && lead.shared_by_username && (
+            <div className="shared-info-banner">
+              <span className="material-icons">person</span>
+              <span>Shared by <strong>@{lead.shared_by_username}</strong> {lead.shared_by_name ? `(${lead.shared_by_name})` : ''}</span>
+            </div>
+          )}
+
           {details.map((d, i) => (
             <div className="detail-item" key={i}>
               <div className="detail-icon"><span className="material-icons">{d.icon}</span></div>
@@ -39,16 +77,51 @@ export default function LeadModal({ lead, onClose, onConvert, onUpdateStatus, on
               </div>
             </div>
           ))}
-        </div>
-        <div className="modal-actions">
-          {lead.status !== 'Converted' && (
-            <button className="btn btn-success" onClick={() => onConvert(lead.id)}>Convert</button>
+
+          {/* Shared with section (only for owned leads) */}
+          {!isShared && shares.length > 0 && (
+            <div className="shared-with-section">
+              <h4 className="shared-with-title">
+                <span className="material-icons">group</span>
+                Shared with ({shares.length})
+              </h4>
+              {shares.map(share => (
+                <div key={share.share_id} className="shared-user-row">
+                  <div className="shared-user-details">
+                    <span className="shared-user-name">@{share.username}</span>
+                    <span className="shared-user-meta">{share.full_name || share.email}</span>
+                  </div>
+                  <button
+                    className="btn-icon-small btn-danger-icon"
+                    onClick={() => handleUnshare(share.username)}
+                    title="Remove sharing"
+                  >
+                    <span className="material-icons">close</span>
+                  </button>
+                </div>
+              ))}
+            </div>
           )}
-          {lead.status !== 'Enquiry' && lead.status !== 'Converted' && (
-            <button className="btn btn-outlined" onClick={() => onUpdateStatus(lead.id, 'Enquiry')}>Mark Enquiry</button>
+          {!isShared && loadingShares && (
+            <div className="shared-loading">
+              <span className="material-icons spinning">sync</span>
+              Loading shares...
+            </div>
           )}
-          <button className="btn btn-outlined" onClick={() => onDelete(lead.id)}>Delete</button>
         </div>
+
+        {/* Actions only for owned leads */}
+        {!isShared && (
+          <div className="modal-actions">
+            {lead.status !== 'Converted' && (
+              <button className="btn btn-success" onClick={() => onConvert(lead.id)}>Convert</button>
+            )}
+            {lead.status !== 'Enquiry' && lead.status !== 'Converted' && (
+              <button className="btn btn-outlined" onClick={() => onUpdateStatus(lead.id, 'Enquiry')}>Mark Enquiry</button>
+            )}
+            <button className="btn btn-outlined" onClick={() => onDelete(lead.id)}>Delete</button>
+          </div>
+        )}
       </div>
     </div>
   )
