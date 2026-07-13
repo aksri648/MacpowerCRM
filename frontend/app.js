@@ -322,11 +322,9 @@ function renderLeadsList(containerId, leads) {
 
 function createLeadCard(lead) {
   const statusClass = getStatusClass(lead.status);
-  const formattedDate = new Date(lead.timestamp).toLocaleDateString('en-IN', {
-    day: 'numeric',
-    month: 'short',
-    year: 'numeric'
-  });
+  const date = new Date(lead.timestamp);
+  const formattedDate = date.toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
+  const formattedTime = date.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', hour12: true });
 
   return `
     <div class="lead-card" onclick="openLeadModal('${lead.id}')">
@@ -354,7 +352,7 @@ function createLeadCard(lead) {
       </div>
       <div class="lead-card-footer">
         <span class="lead-price">₹${formatPrice(lead.price)}</span>
-        <span class="lead-date">${formattedDate}</span>
+        <span class="lead-date">${formattedDate} ${formattedTime}</span>
       </div>
     </div>
   `;
