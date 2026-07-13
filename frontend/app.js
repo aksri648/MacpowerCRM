@@ -5,7 +5,7 @@
 
 // ==================== Configuration ====================
 const CONFIG = {
-  API_URL: 'https://script.google.com/macros/s/AKfycbz5yTPVxnSz9MgPtPp8pVf7nnHIAB5JdW3NDo34RDMwCMPG_lQLxpyQC_BKkaByQOxzgw/exec',
+  API_URL: 'https://script.google.com/macros/s/AKfycbzKybLv1kmb1Wg4sZZAIUqWEwxp3bgXLWm0bOxOTZbCxJSR17Akh5OXht5E64VLObXYBw/exec',
   STORAGE_KEY: 'macpower_crm_data'
 };
 

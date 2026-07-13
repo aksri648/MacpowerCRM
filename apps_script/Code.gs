@@ -4,7 +4,7 @@
  */
 
 // Spreadsheet ID - Replace with your actual Google Sheet ID
-const SPREADSHEET_ID = 'YOUR_SPREADSHEET_ID_HERE';
+const SPREADSHEET_ID = '1qByQjv_qD73mBGP9WqbcYLG0948cfHi7F7JNFQL9Iuw';
 const LEADS_SHEET = 'Leads';
 const SETTINGS_SHEET = 'Settings';
 
@@ -120,7 +120,7 @@ function addLead(data) {
   // Prepare row data
   const rowData = [
     leadId,
-    new Date().toISOString(),
+    Utilities.formatDate(new Date(), 'Asia/Kolkata', 'yyyy-MM-dd HH:mm:ss'),
     data.companyName || '',
     data.contactPerson || '',
     data.phone || '',
