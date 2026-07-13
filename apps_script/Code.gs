@@ -418,6 +418,10 @@ function getDashboard() {
         id: allData[i][0],
         companyName: allData[i][2],
         contactPerson: allData[i][3],
+        phone: allData[i][4],
+        area: allData[i][5],
+        machineModel: allData[i][6],
+        price: allData[i][7],
         status: allData[i][11],
         timestamp: allData[i][1]
       });
