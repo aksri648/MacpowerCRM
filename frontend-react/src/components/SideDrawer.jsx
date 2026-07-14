@@ -25,9 +25,9 @@ export default function SideDrawer({ open, onClose, onNavigate, currentPath }) {
       <nav className={`side-drawer ${open ? 'open' : ''}`}>
         <div className="drawer-header">
           <div className="drawer-logo">
-            <img src="/logo.jpg" alt="Macpower CNC Limited" className="drawer-logo-img" />
+            <img src="/logo.jpg" alt="Macpower CNC Machines Limited" className="drawer-logo-img" />
           </div>
-          <h2>Macpower CNC Limited</h2>
+          <h2>Macpower CNC Machines Limited</h2>
           {user && (
             <p className="drawer-user-info">
               {user.fullName || user.primaryEmailAddress?.emailAddress || 'User'}

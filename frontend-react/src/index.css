@@ -202,12 +202,11 @@ html, body {
 
 .drawer-logo {
   width: 100%;
-  background: rgba(255, 255, 255, 0.95);
-  border-radius: var(--radius-sm);
+  background: none;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 12px;
+  padding: 6px 0;
   margin-bottom: 16px;
 }
 
@@ -216,10 +215,12 @@ html, body {
 }
 
 .drawer-logo-img {
-  width: 100%;
+  width: 65%;
   height: auto;
   object-fit: contain;
   display: block;
+  margin: 0 auto;
+  border-radius: 16px;
 }
 
 .drawer-header h2 {
@@ -1197,10 +1198,12 @@ html, body {
 }
 
 .auth-logo-img {
-  width: 100%;
+  width: 50%;
   height: auto;
   object-fit: contain;
   border-radius: var(--radius-md);
+  display: block;
+  margin: 0 auto;
 }
 
 /* Constrain Clerk's sign-in/sign-up card to a normal centered width */
